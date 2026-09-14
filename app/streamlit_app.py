@@ -138,14 +138,17 @@ if st.button("Get Differential Diagnosis", disabled=bool(missing) or has_range_e
     st.table(results)
 
     st.header("About Each Condition")
-    st.caption("Follow-up tests are general educational guidance, not a prescription — always consult a clinician.")
+    st.caption("Hover the ⓘ for details · click the name to learn more. Not a prescription — always consult a clinician.")
 
     for diag in results['Diagnosis']:
         info = DIAGNOSIS_INFO.get(diag)
         if info:
-            with st.expander(diag):
-                st.write(info['description'])
-                st.write(f"**Follow-up tests to confirm/rule out:** {info['tests']}")
-                st.markdown(f"[Learn more]({info['link']})")
+            tooltip = f"{info['description']} Follow-up tests: {info['tests']}"
+            st.markdown(
+                f'<a href="{info["link"]}" target="_blank" style="text-decoration:none; color:inherit;">'
+                f'<b>{diag}</b></a> '
+                f'<span title="{tooltip}" style="cursor:help; opacity:0.6;">ⓘ</span>',
+                unsafe_allow_html=True
+            )
 st.markdown("---")
 st.caption("Built by Anshika Garg · dnamazing17x@gmail.com")
