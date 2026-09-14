@@ -137,7 +137,7 @@ if st.button("Get Differential Diagnosis", disabled=bool(missing) or has_range_e
     st.header("Ranked Differential")
     st.table(results)
 
-        st.header("About Each Condition")
+    st.header("About Each Condition")
     st.caption("Follow-up tests are general educational guidance, not a prescription — always consult a clinician.")
 
     for diag in results['Diagnosis']:
@@ -146,5 +146,7 @@ if st.button("Get Differential Diagnosis", disabled=bool(missing) or has_range_e
             with st.expander(diag):
                 st.write(info['description'])
                 st.write(f"**Follow-up tests to confirm/rule out:** {info['tests']}")
-                st.markdown(f"[Learn more]({info['link']})")st.markdown("---")
+                st.markdown(f"[Learn more]({info['link']})")
+
+st.markdown("---")
 st.caption("Built by Anshika Garg · dnamazing17x@gmail.com")
