@@ -6,6 +6,54 @@ model = joblib.load('models/rf_model.pkl')
 imputer = joblib.load('models/imputer.pkl')
 feature_names = joblib.load('models/feature_names.pkl')
 
+DIAGNOSIS_INFO = {
+    'Healthy': {
+        'description': 'CBC values fall within normal reference ranges, with no pattern suggesting a blood disorder.',
+        'tests': 'None indicated based on CBC alone; routine follow-up as advised by a clinician.',
+        'link': 'https://medlineplus.gov/lab-tests/complete-blood-count-cbc/'
+    },
+    'Iron deficiency anemia': {
+        'description': 'A microcytic, hypochromic anemia caused by insufficient iron for hemoglobin production, often due to blood loss, poor intake, or malabsorption.',
+        'tests': 'Serum ferritin, serum iron, TIBC/transferrin saturation, peripheral smear.',
+        'link': 'https://medlineplus.gov/ency/article/000584.htm'
+    },
+    'Normocytic hypochromic anemia': {
+        'description': 'Anemia with normal-sized red cells but reduced hemoglobin content, seen in early iron deficiency, chronic disease, or mixed nutritional deficiencies.',
+        'tests': 'Ferritin, iron studies, inflammatory markers (CRP/ESR), reticulocyte count.',
+        'link': 'https://medlineplus.gov/ency/article/000560.htm'
+    },
+    'Normocytic normochromic anemia': {
+        'description': 'Anemia with normal-sized, normally colored red cells — commonly due to chronic disease, kidney disease, acute blood loss, or bone marrow suppression.',
+        'tests': 'Reticulocyte count, kidney function tests, inflammatory markers, peripheral smear.',
+        'link': 'https://medlineplus.gov/ency/article/000560.htm'
+    },
+    'Other microcytic anemia': {
+        'description': 'Small red cells from a cause other than classic iron deficiency, such as thalassemia trait or anemia of chronic disease.',
+        'tests': 'Hemoglobin electrophoresis, ferritin, iron studies, peripheral smear.',
+        'link': 'https://medlineplus.gov/ency/article/000589.htm'
+    },
+    'Macrocytic anemia': {
+        'description': 'Anemia with abnormally large red cells, often linked to vitamin B12 or folate deficiency, liver disease, or hypothyroidism.',
+        'tests': 'Vitamin B12, folate levels, liver function tests, thyroid function tests, peripheral smear.',
+        'link': 'https://medlineplus.gov/ency/article/000578.htm'
+    },
+    'Thrombocytopenia': {
+        'description': 'A low platelet count, which can result from decreased production, increased destruction, or sequestration of platelets.',
+        'tests': 'Peripheral smear, coagulation panel, liver function tests, viral serologies if indicated.',
+        'link': 'https://medlineplus.gov/ency/article/000586.htm'
+    },
+    'Leukemia': {
+        'description': 'A group of blood cancers marked by abnormal white blood cell production, which can crowd out normal blood cells.',
+        'tests': 'Peripheral blood smear, bone marrow biopsy, flow cytometry — should be evaluated urgently by a specialist.',
+        'link': 'https://medlineplus.gov/leukemia.html'
+    },
+    'Leukemia with thrombocytopenia': {
+        'description': 'A leukemia pattern with an accompanying low platelet count, which can increase bleeding risk.',
+        'tests': 'Peripheral blood smear, bone marrow biopsy, flow cytometry, coagulation panel — urgent specialist evaluation recommended.',
+        'link': 'https://medlineplus.gov/leukemia.html'
+    },
+}
+
 st.title("LabSense — CBC Differential Diagnosis")
 st.write("Enter CBC values below to get a ranked differential diagnosis.")
 st.warning("Educational/research prototype only — not for clinical use.")
@@ -89,5 +137,15 @@ if st.button("Get Differential Diagnosis", disabled=bool(missing) or has_range_e
     st.header("Ranked Differential")
     st.table(results)
 
+    st.header("About Each Condition")
+    st.caption("Follow-up tests are general educational guidance, not a prescription — always consult a clinician.")
+
+    for diag in results['Diagnosis']:
+        info = DIAGNOSIS_INFO.get(diag)
+        if info:
+            with st.expander(diag):
+                st.write(info['description'])
+                st.write(f"**Follow-up tests to confirm/rule out:** {info['tests']}")
+                st.markdown(f"[Learn more]({info['link']})")
 st.markdown("---")
 st.caption("Built by Anshika Garg · dnamazing17x@gmail.com")
