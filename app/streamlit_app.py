@@ -33,26 +33,48 @@ with col2:
     inputs['NEUTn'] = st.number_input("Neutrophil count (NEUTn)", value=0.0)
 
 if st.button("Get Differential Diagnosis"):
-    row = {}
-    for col in feature_names:
-        if col.endswith('_was_measured'):
-            base_col = col.replace('_was_measured', '')
-            row[col] = 1 if inputs.get(base_col, 0) != 0 else 0
-        else:
-            val = inputs.get(col, None)
-            row[col] = None if val == 0.0 and col in ['LYMp','NEUTp','LYMn','NEUTn'] else val
+    errors = []
+    if not (3 <= inputs['HGB'] <= 25):
+        errors.append("Hemoglobin (HGB) must be between 3 and 25 g/dL")
+    if not (40 <= inputs['MCV'] <= 150):
+        errors.append("MCV must be between 40 and 150 fL")
+    if not (1 <= inputs['RBC'] <= 8):
+        errors.append("RBC must be between 1 and 8 million/µL")
+    if not (0.5 <= inputs['WBC'] <= 100):
+        errors.append("WBC must be between 0.5 and 100 x10^9/L")
+    if not (10 <= inputs['HCT'] <= 65):
+        errors.append("HCT must be between 10 and 65%")
+    if not (0 <= inputs['PLT'] <= 1500):
+        errors.append("Platelets (PLT) must be between 0 and 1500 x10^9/L")
+    if inputs['LYMp'] != 0 and not (0 <= inputs['LYMp'] <= 100):
+        errors.append("Lymphocyte % must be between 0 and 100")
+    if inputs['NEUTp'] != 0 and not (0 <= inputs['NEUTp'] <= 100):
+        errors.append("Neutrophil % must be between 0 and 100")
 
-    input_df = pd.DataFrame([row])[feature_names]
-    input_imputed = imputer.transform(input_df)
+    if errors:
+        st.error("Please fix the following before submitting:\n\n" + "\n".join(f"- {e}" for e in errors))
+    else:
+        row = {}
+        for col in feature_names:
+            if col.endswith('_was_measured'):
+                base_col = col.replace('_was_measured', '')
+                row[col] = 1 if inputs.get(base_col, 0) != 0 else 0
+            else:
+                val = inputs.get(col, None)
+                row[col] = None if val == 0.0 and col in ['LYMp','NEUTp','LYMn','NEUTn'] else val
 
-    probs = model.predict_proba(input_imputed)[0]
-    classes = model.classes_
+        input_df = pd.DataFrame([row])[feature_names]
+        input_imputed = imputer.transform(input_df)
 
-    results = pd.DataFrame({'Diagnosis': classes, 'Probability': probs})
-    results = results.sort_values('Probability', ascending=False)
-    results['Probability'] = (results['Probability'] * 100).round(1).astype(str) + '%'
+        probs = model.predict_proba(input_imputed)[0]
+        classes = model.classes_
 
-    st.header("Ranked Differential")
-    st.table(results)
+        results = pd.DataFrame({'Diagnosis': classes, 'Probability': probs})
+        results = results.sort_values('Probability', ascending=False)
+        results['Probability'] = (results['Probability'] * 100).round(1).astype(str) + '%'
+
+        st.header("Ranked Differential")
+        st.table(results)
+
 st.markdown("---")
 st.caption("Built by Anshika Garg · dnamazing17x@gmail.com")
