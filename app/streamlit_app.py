@@ -54,3 +54,5 @@ if st.button("Get Differential Diagnosis"):
 
     st.header("Ranked Differential")
     st.table(results)
+st.markdown("---")
+st.caption("Built by Anshika Garg · dnamazing17x@gmail.com")
