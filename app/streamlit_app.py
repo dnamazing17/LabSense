@@ -82,7 +82,8 @@ if st.button("Get Differential Diagnosis", disabled=bool(missing) or has_range_e
     classes = model.classes_
 
     results = pd.DataFrame({'Diagnosis': classes, 'Probability': probs})
-    results = results.sort_values('Probability', ascending=False)
+    results = results.sort_values('Probability', ascending=False).reset_index(drop=True)
+    results.index = results.index + 1
     results['Probability'] = (results['Probability'] * 100).round(1).astype(str) + '%'
 
     st.header("Ranked Differential")
